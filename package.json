@@ -31,5 +31,8 @@
     "examples/rust-sdk/*",
     "docs/*",
     "whirlpool-dashboard"
-  ]
+  ],
+  "dependencies": {
+    "react-is": "^19.2.3"
+  }
 }

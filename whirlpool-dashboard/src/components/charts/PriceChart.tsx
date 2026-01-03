@@ -12,7 +12,7 @@ interface PriceChartProps {
     data?: PriceData[];
     loading?: boolean;
     coinId?: string; // Optional dynamic coin ID to fetch data
-    title?: string;
+    title?: React.ReactNode;
 }
 
 const BACKEND_URL = 'http://localhost:3001';
@@ -76,7 +76,7 @@ export const PriceChart = ({ data = [], loading: initialLoading, coinId, title =
 
     return (
         <ChartCard
-            title={coinId ? `${title} (${coinId.toUpperCase()})` : title}
+            title={title}
             headerRight={
                 <div className="flex gap-1 text-xs bg-gray-900/50 p-1 rounded-full border border-gray-700">
                     {['15M', '1H', '4H', '24H', '7D'].map(range => (

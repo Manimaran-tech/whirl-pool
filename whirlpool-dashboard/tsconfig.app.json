@@ -10,8 +10,7 @@
     ],
     "module": "ESNext",
     "types": [
-      "node",
-      "vite/client"
+      "node"
     ],
     "skipLibCheck": true,
     /* Bundler mode */

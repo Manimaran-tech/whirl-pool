@@ -1,7 +1,27 @@
 import { usePools } from '../hooks/usePools';
 import { Loader2, ArrowRightLeft } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CreatePositionPanel } from './CreatePositionPanel';
+import { getTokenPrice } from '../services/priceService';
+
+// Helper component to fetch and display USD price
+const TokenUsdPrice = ({ token }: { token: string }) => {
+    const [price, setPrice] = useState<number | null>(null);
+
+    useEffect(() => {
+        let mounted = true;
+        getTokenPrice(token).then(p => {
+            if (mounted) setPrice(p);
+        });
+        return () => { mounted = false; };
+    }, [token]);
+
+    if (price === null) return <span className="text-muted-foreground animate-pulse">...</span>;
+
+    // Format: < $0.01 show 6 decimals, < $1 show 4, else 2
+    const decimals = price < 0.01 ? 6 : price < 1 ? 4 : 2;
+    return <span>${price.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}</span>;
+};
 
 export const PoolList = () => {
     const { pools, loading } = usePools();
@@ -28,7 +48,7 @@ export const PoolList = () => {
                     <thead className="bg-muted/50 text-muted-foreground text-sm uppercase tracking-wider">
                         <tr>
                             <th className="px-6 py-4 font-semibold">Pair</th>
-                            <th className="px-6 py-4 font-semibold">Price</th>
+                            <th className="px-6 py-4 font-semibold">Price (USD)</th>
                             <th className="px-6 py-4 font-semibold">Fee Tier</th>
                             <th className="px-6 py-4 font-semibold">Liquidity</th>
                             <th className="px-6 py-4 font-semibold text-right">Actions</th>
@@ -46,7 +66,18 @@ export const PoolList = () => {
                                         <span className="font-semibold">{pool.tokenA}/{pool.tokenB}</span>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4 font-medium">{pool.price}</td>
+                                <td className="px-6 py-4 font-medium">
+                                    {/* 
+                                      Heuristic: Show the "Asset" price.
+                                      - Default: Show Token A.
+                                      - Exception: If A is SOL and B is NOT stable (e.g. SOL/PENGU), show B.
+                                    */}
+                                    <TokenUsdPrice token={
+                                        (pool.tokenA === 'SOL' && !['USDC', 'USDT'].includes(pool.tokenB))
+                                            ? pool.tokenB
+                                            : pool.tokenA
+                                    } />
+                                </td>
                                 <td className="px-6 py-4 text-muted-foreground">{(pool.feeTier).toFixed(2)}%</td>
                                 <td className="px-6 py-4 font-medium">{pool.liquidity}</td>
                                 <td className="px-6 py-4 text-right">

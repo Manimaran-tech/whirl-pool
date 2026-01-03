@@ -71,6 +71,38 @@ export async function getSOLPrice(): Promise<number> {
         console.warn('Price Service: Jupiter failed:', error);
     }
 
+    // 3. Fallback to DexScreener
+    try {
+        const response = await fetch(
+            'https://api.dexscreener.com/latest/dex/pairs/solana/JUPyiwrYJFskUPiHa7hkeR8VUtkPHCLkdPwmRP89ps' // JUP/SOL pair
+        );
+        if (response.ok) {
+            const data = await response.json();
+            const pair = data.pair;
+            if (pair) {
+                // specific pair logic was incomplete/unused, skipping to search fallback
+            }
+        }
+
+        // Simpler: Search for SOL
+        const searchRes = await fetch('https://api.dexscreener.com/latest/dex/search?q=SOL%2FUSDC');
+        if (searchRes.ok) {
+            const data = await searchRes.json();
+            const pair = data.pairs?.find((p: any) => p.baseToken.symbol === 'SOL' && p.quoteToken.symbol === 'USDC');
+            if (pair) {
+                const price = parseFloat(pair.priceUsd);
+                if (price > 0) {
+                    console.log('Price Service: Got SOL price from DexScreener:', price);
+                    priceCache = { solPrice: price, timestamp: now };
+                    return price;
+                }
+            }
+        }
+
+    } catch (error) {
+        console.warn('Price Service: DexScreener SOL fallback failed:', error);
+    }
+
     // Return cached value if available (even if stale), otherwise return 0
     console.log('Price Service: All APIs failed, returning cached/default value');
     return priceCache.solPrice || 0;
@@ -82,16 +114,22 @@ export async function getSOLPrice(): Promise<number> {
 export async function getTokenPrice(symbol: string): Promise<number> {
     if (!symbol) return 0;
 
-    // Normalize symbol for common tokens
-    const querySymbol = symbol === 'SOL' ? 'SOL' :
-        symbol === 'USDC' ? 'USDC' :
-            symbol === 'USDT' ? 'USDT' :
-                symbol;
+    // Use specialized SOL fetcher if applicable
+    if (symbol === 'SOL' || symbol === 'So11111111111111111111111111111111111111112') {
+        const solPrice = await getSOLPrice();
+        if (solPrice > 0) return solPrice;
+        // If that fails, fall through to generic logic (DexScreener etc)
+    }
 
+    // Normalize symbol for common tokens
+    const querySymbol = symbol === 'JupSOL' ? 'JupSOL' : symbol.toUpperCase();
+
+    // 1. Try Jupiter first
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 sec timeout
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
 
+        // Jupiter handles most Solana tokens by symbol or address
         const response = await fetch(
             `https://price.jup.ag/v6/price?ids=${querySymbol}`,
             { signal: controller.signal }
@@ -106,7 +144,56 @@ export async function getTokenPrice(symbol: string): Promise<number> {
             }
         }
     } catch (error) {
-        console.warn(`Price Service: Failed to fetch price for ${symbol}:`, error);
+        console.warn(`Price Service: Jupiter failed for ${symbol}:`, error);
+    }
+
+    // 2. Fallback to CoinGecko (using manual mapping if available)
+    try {
+        // Simple mapping for common missing tokens
+        const geckoIds: Record<string, string> = {
+            'PENGU': 'pengu-2',
+            'JUP': 'jupiter-exchange-solana',
+            'JUPSOL': 'jupiter-staked-sol'
+        };
+
+        const geckoId = geckoIds[symbol.toUpperCase()] || symbol.toLowerCase();
+
+        const response = await fetch(
+            `https://api.coingecko.com/api/v3/simple/price?ids=${geckoId}&vs_currencies=usd`
+        );
+
+        if (response.ok) {
+            const data = await response.json();
+            const price = data[geckoId]?.usd || 0;
+            if (price > 0) return price;
+        }
+    } catch (e) {
+        console.warn(`Price Service: CoinGecko fallback failed for ${symbol}`, e);
+    }
+
+    // 3. Fallback to DexScreener (Search by symbol)
+    try {
+        const response = await fetch(
+            `https://api.dexscreener.com/latest/dex/search?q=${symbol}`
+        );
+
+        if (response.ok) {
+            const data = await response.json();
+            // Find the most liquid pair for this token
+            if (data.pairs && data.pairs.length > 0) {
+                // Filter for pairs on Solana to be safe
+                const solPairs = data.pairs.filter((p: any) => p.chainId === 'solana');
+                const bestPair = solPairs.length > 0 ? solPairs[0] : data.pairs[0];
+
+                const price = parseFloat(bestPair.priceUsd);
+                if (price > 0) {
+                    console.log(`Price Service: DexScreener found price for ${symbol}: ${price}`);
+                    return price;
+                }
+            }
+        }
+    } catch (e) {
+        console.warn(`Price Service: DexScreener fallback failed for ${symbol}`, e);
     }
 
     return 0;

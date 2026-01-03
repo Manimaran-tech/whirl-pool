@@ -3037,7 +3037,7 @@
   resolved "https://registry.npmjs.org/@opentelemetry/api/-/api-1.9.0.tgz"
   integrity sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==
 
-"@orca-so/common-sdk@*", "@orca-so/common-sdk@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\legacy-sdk\\common":
+"@orca-so/common-sdk@*", "@orca-so/common-sdk@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\legacy-sdk\\common":
   version "0.7.0"
   resolved "file:legacy-sdk/common"
   dependencies:
@@ -3045,11 +3045,11 @@
     tiny-invariant "^1.3.1"
     wasm-pack "0.0.0"
 
-"@orca-so/rust-tx-sender@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\rust-sdk\\tx-sender":
+"@orca-so/rust-tx-sender@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\rust-sdk\\tx-sender":
   version "3.0.0"
   resolved "file:rust-sdk/tx-sender"
 
-"@orca-so/tx-sender@*", "@orca-so/tx-sender@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\ts-sdk\\tx-sender":
+"@orca-so/tx-sender@*", "@orca-so/tx-sender@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\ts-sdk\\tx-sender":
   version "3.0.0"
   resolved "file:ts-sdk/tx-sender"
   dependencies:
@@ -3057,27 +3057,27 @@
     "@solana-program/compute-budget" "^0.11.0"
     "@solana-program/system" "^0.10.0"
 
-"@orca-so/whirlpools-client@*", "@orca-so/whirlpools-client@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\ts-sdk\\client":
+"@orca-so/whirlpools-client@*", "@orca-so/whirlpools-client@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\ts-sdk\\client":
   version "6.0.0"
   resolved "file:ts-sdk/client"
 
-"@orca-so/whirlpools-core@*", "@orca-so/whirlpools-core@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\ts-sdk\\core":
+"@orca-so/whirlpools-core@*", "@orca-so/whirlpools-core@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\ts-sdk\\core":
   version "3.0.0"
   resolved "file:ts-sdk/core"
 
-"@orca-so/whirlpools-docs-legacy@*", "@orca-so/whirlpools-docs-legacy@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\docs\\legacy":
+"@orca-so/whirlpools-docs-legacy@*", "@orca-so/whirlpools-docs-legacy@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\docs\\legacy":
   version "0.2.8"
   resolved "file:docs/legacy"
 
-"@orca-so/whirlpools-docs-rust@*", "@orca-so/whirlpools-docs-rust@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\docs\\rust":
+"@orca-so/whirlpools-docs-rust@*", "@orca-so/whirlpools-docs-rust@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\docs\\rust":
   version "0.2.8"
   resolved "file:docs/rust"
 
-"@orca-so/whirlpools-docs-ts@*", "@orca-so/whirlpools-docs-ts@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\docs\\ts":
+"@orca-so/whirlpools-docs-ts@*", "@orca-so/whirlpools-docs-ts@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\docs\\ts":
   version "0.2.8"
   resolved "file:docs/ts"
 
-"@orca-so/whirlpools-docs@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\docs\\whirlpool":
+"@orca-so/whirlpools-docs@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\docs\\whirlpool":
   version "0.2.8"
   resolved "file:docs/whirlpool"
   dependencies:
@@ -3094,11 +3094,11 @@
     rehype-katex "^7.0.1"
     remark-math "^6.0.0"
 
-"@orca-so/whirlpools-example-rust-repositioning-bot@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\examples\\rust-sdk\\whirlpool_repositioning_bot":
+"@orca-so/whirlpools-example-rust-repositioning-bot@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\examples\\rust-sdk\\whirlpool_repositioning_bot":
   version "0.3.0"
   resolved "file:examples/rust-sdk/whirlpool_repositioning_bot"
 
-"@orca-so/whirlpools-example-ts-next@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\examples\\ts-sdk\\next":
+"@orca-so/whirlpools-example-ts-next@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\examples\\ts-sdk\\next":
   version "0.2.0"
   resolved "file:examples/ts-sdk/next"
   dependencies:
@@ -3111,37 +3111,37 @@
     react "^19.2.0"
     react-dom "^19.2.0"
 
-"@orca-so/whirlpools-integration@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\ts-sdk\\integration":
+"@orca-so/whirlpools-integration@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\ts-sdk\\integration":
   version "0.1.1"
   resolved "file:ts-sdk/integration"
   dependencies:
     "@orca-so/whirlpools" "*"
 
-"@orca-so/whirlpools-lint@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\ts-sdk\\lint":
+"@orca-so/whirlpools-lint@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\ts-sdk\\lint":
   version "0.1.1"
   resolved "file:ts-sdk/lint"
 
-"@orca-so/whirlpools-program@*", "@orca-so/whirlpools-program@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\programs\\whirlpool":
+"@orca-so/whirlpools-program@*", "@orca-so/whirlpools-program@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\programs\\whirlpool":
   version "0.7.0"
   resolved "file:programs/whirlpool"
 
-"@orca-so/whirlpools-rust-client@*", "@orca-so/whirlpools-rust-client@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\rust-sdk\\client":
+"@orca-so/whirlpools-rust-client@*", "@orca-so/whirlpools-rust-client@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\rust-sdk\\client":
   version "7.0.0"
   resolved "file:rust-sdk/client"
 
-"@orca-so/whirlpools-rust-core@*", "@orca-so/whirlpools-rust-core@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\rust-sdk\\core":
+"@orca-so/whirlpools-rust-core@*", "@orca-so/whirlpools-rust-core@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\rust-sdk\\core":
   version "2.0.1"
   resolved "file:rust-sdk/core"
 
-"@orca-so/whirlpools-rust-macros@*", "@orca-so/whirlpools-rust-macros@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\rust-sdk\\macros":
+"@orca-so/whirlpools-rust-macros@*", "@orca-so/whirlpools-rust-macros@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\rust-sdk\\macros":
   version "1.0.5"
   resolved "file:rust-sdk/macros"
 
-"@orca-so/whirlpools-rust@*", "@orca-so/whirlpools-rust@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\rust-sdk\\whirlpool":
+"@orca-so/whirlpools-rust@*", "@orca-so/whirlpools-rust@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\rust-sdk\\whirlpool":
   version "6.0.0"
   resolved "file:rust-sdk/whirlpool"
 
-"@orca-so/whirlpools-sdk-cli@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\legacy-sdk\\cli":
+"@orca-so/whirlpools-sdk-cli@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\legacy-sdk\\cli":
   version "0.5.0"
   resolved "file:legacy-sdk/cli"
   dependencies:
@@ -3158,11 +3158,11 @@
     wasm-pack "0.0.0"
     yaml "^2.8.1"
 
-"@orca-so/whirlpools-sdk-integration@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\legacy-sdk\\integration":
+"@orca-so/whirlpools-sdk-integration@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\legacy-sdk\\integration":
   version "0.2.0"
   resolved "file:legacy-sdk/integration"
 
-"@orca-so/whirlpools-sdk@*", "@orca-so/whirlpools-sdk@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\legacy-sdk\\whirlpool":
+"@orca-so/whirlpools-sdk@*", "@orca-so/whirlpools-sdk@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\legacy-sdk\\whirlpool":
   version "0.17.4"
   resolved "file:legacy-sdk/whirlpool"
   dependencies:
@@ -3171,7 +3171,7 @@
     tiny-invariant "^1.3.1"
     wasm-pack "0.0.0"
 
-"@orca-so/whirlpools@*", "@orca-so/whirlpools@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\ts-sdk\\whirlpool":
+"@orca-so/whirlpools@*", "@orca-so/whirlpools@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\ts-sdk\\whirlpool":
   version "6.0.0"
   resolved "file:ts-sdk/whirlpool"
   dependencies:
@@ -14075,7 +14075,12 @@ react-is@^16.7.0:
   resolved "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
-"react-is@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", react-is@^18.3.1:
+"react-is@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", react-is@^19.2.3:
+  version "19.2.3"
+  resolved "https://registry.npmjs.org/react-is/-/react-is-19.2.3.tgz"
+  integrity sha512-qJNJfu81ByyabuG7hPFEbXqNcWSU3+eVus+KJs+0ncpGfMyYdvSmxiJxbWR65lYi1I+/0HBcliO029gc4F+PnA==
+
+react-is@^18.3.1:
   version "18.3.1"
   resolved "https://registry.npmjs.org/react-is/-/react-is-18.3.1.tgz"
   integrity sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==
@@ -16616,7 +16621,7 @@ which@^2.0.1:
   dependencies:
     isexe "^2.0.0"
 
-"whirlpool-dashboard@file:C:\\Users\\rajan\\OneDrive\\Documents\\whirlpools\\whirlpool-dashboard":
+"whirlpool-dashboard@file:C:\\Users\\K\\Desktop\\my python programs\\yeildsense\\whirlpools-main\\whirlpool-dashboard":
   version "0.0.0"
   resolved "file:whirlpool-dashboard"
   dependencies:
@@ -16632,6 +16637,7 @@ which@^2.0.1:
     process "^0.11.10"
     react "^19.2.0"
     react-dom "^19.2.0"
+    react-is "^19.2.3"
     react-router-dom "^7.11.0"
     recharts "^3.6.0"
     util "^0.12.5"

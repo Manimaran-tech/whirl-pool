@@ -185,3 +185,110 @@ export const tradingApi = {
         return response.json();
     },
 };
+
+// ==========================
+// ML API CLIENT
+// ==========================
+const ML_API_URL = 'http://127.0.0.1:5000';
+
+export interface MLQuickAnalysis {
+    success: boolean;
+    token_a: {
+        symbol: string;
+        current_price: number;
+        predicted_price: number;
+        lower_bound: number;
+        upper_bound: number;
+        range_width_pct: number;
+        safety_score: number;
+    };
+    token_b: {
+        symbol: string;
+        current_price: number;
+        predicted_price: number;
+        lower_bound: number;
+        upper_bound: number;
+        range_width_pct: number;
+        safety_score: number;
+    };
+    overall: {
+        safety_score: number;
+        recommendation: string;
+        signal: string;
+        message: string;
+    };
+    error?: string;
+}
+
+export const mlApi = {
+    /**
+     * Check ML API health
+     */
+    async healthCheck(): Promise<{ status: string; models: { volatility: boolean; sentiment: boolean } }> {
+        const response = await fetch(`${ML_API_URL}/api/health`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) throw new Error('ML API is not available');
+        return response.json();
+    },
+
+    /**
+     * Get quick analysis for a token pair (optimized for UI)
+     */
+    async getQuickAnalysis(tokenA: string, tokenB: string, priceA?: number, priceB?: number): Promise<MLQuickAnalysis> {
+        const response = await fetch(`${ML_API_URL}/api/farming/quick-analysis`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                token_a: tokenA.toLowerCase(),
+                token_b: tokenB.toLowerCase(),
+                price_a: priceA,
+                price_b: priceB
+            })
+        });
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({ error: 'Request failed' }));
+            throw new Error(error.error || 'Failed to get analysis');
+        }
+        return response.json();
+    },
+
+    /**
+     * Get news and sentiment for a token
+     */
+    async getTokenNews(token: string): Promise<{
+        success: boolean;
+        token: string;
+        news_available: boolean;
+        sentiment: {
+            net_sentiment: number;
+            confidence: number;
+            trend: 'bullish' | 'bearish' | 'neutral';
+            headlines: Array<{
+                headline: string;
+                sentiment: 'positive' | 'negative' | 'neutral';
+                score: number;
+            }>;
+        };
+    }> {
+        const response = await fetch(`${ML_API_URL}/api/news/${token.toLowerCase()}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) {
+            return {
+                success: false,
+                token: token.toUpperCase(),
+                news_available: false,
+                sentiment: {
+                    net_sentiment: 0,
+                    confidence: 0.5,
+                    trend: 'neutral',
+                    headlines: []
+                }
+            };
+        }
+        return response.json();
+    }
+};

@@ -10,7 +10,10 @@ export const COIN_GECKO_IDS: Record<string, string> = {
     'RAY': 'raydium',
     'mSOL': 'msol',
     'bSOL': 'blazestake-staked-sol',
-    'WIF': 'dogwifhat'
+    'WIF': 'dogwifhat',
+    'PENGU': 'pudgy-penguins',
+    'TRUMP': 'official-trump',
+    'JUP': 'jupiter-exchange-solana'
 };
 
 export function getCoinGeckoId(symbol: string): string {

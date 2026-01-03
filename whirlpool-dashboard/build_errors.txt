@@ -1,9 +1,0 @@
-﻿src/components/ClosePositionModal.tsx(6,23): error TS6133: 'PDAUtil' is declared but its value is never read.
-src/components/ClosePositionModal.tsx(6,32): error TS6133: 'ORCA_WHIRLPOOL_PROGRAM_ID' is declared but its value is never read.
-src/components/ClosePositionModal.tsx(60,19): error TS6133: 'positionData' is declared but its value is never read.
-src/components/CollectFeesModal.tsx(7,30): error TS6133: 'resolveOrCreateATAs' is declared but its value is never read.
-src/components/CollectFeesModal.tsx(7,51): error TS6133: 'EMPTY_INSTRUCTION' is declared but its value is never read.
-src/components/CollectFeesModal.tsx(93,118): error TS2339: Property 'getStartTickIndex' does not exist on type 'typeof PoolUtil'.
-src/components/CollectFeesModal.tsx(94,118): error TS2339: Property 'getStartTickIndex' does not exist on type 'typeof PoolUtil'.
-src/components/CreatePositionPanel.tsx(52,22): error TS6133: 'setSlippage' is declared but its value is never read.
-src/hooks/usePositions.ts(62,26): error TS6133: 'pubkey' is declared but its value is never read.

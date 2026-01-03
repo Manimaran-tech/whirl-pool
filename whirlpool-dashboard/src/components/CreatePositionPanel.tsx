@@ -7,6 +7,12 @@ import { api } from '../api';
 import { deserializeTransaction } from '../utils/transactions';
 import { PriceChart } from './charts/PriceChart';
 import { getCoinGeckoId } from '../utils/coinMapping';
+import { MLInsightsPanel } from './MLInsightsPanel';
+import { TokenNewsPanel } from './TokenNewsPanel';
+
+
+
+
 
 interface CreatePositionPanelProps {
     isOpen: boolean;
@@ -35,6 +41,7 @@ export const CreatePositionPanel: FC<CreatePositionPanelProps> = ({
     const [currentPrice, setCurrentPrice] = useState<number>(0);
     const [tokenAPriceUsd, setTokenAPriceUsd] = useState<number>(0);
     const [tokenBPriceUsd, setTokenBPriceUsd] = useState<number>(0);
+    const [displayToken, setDisplayToken] = useState<string>(tokenA); // Which token to display in chart
     const [minPrice, setMinPrice] = useState<string>('');
     const [maxPrice, setMaxPrice] = useState<string>('');
 
@@ -53,47 +60,91 @@ export const CreatePositionPanel: FC<CreatePositionPanelProps> = ({
     const [txSignature, setTxSignature] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+
     // Fetch current price on mount
     useEffect(() => {
+        if (!isOpen || !poolAddress) return;
+
         const fetchPrice = async () => {
             setPriceLoading(true);
             try {
-                console.log("CreatePositionPanel: Fetching pool data for", poolAddress);
-                // 1. Fetch official pool data from backend (primary source for ratio/range)
-                const poolData = await api.getPool(poolAddress);
-                console.log("CreatePositionPanel: Received pool data:", poolData);
+                console.log("CreatePositionPanel: Fetching prices for", tokenA, tokenB);
 
-                if (poolData && poolData.price) {
-                    const price = parseFloat(poolData.price);
-                    console.log("CreatePositionPanel: Parsed price:", price);
-                    // Ensure price is valid number and > 0
-                    if (!isNaN(price) && price > 0) {
-                        setCurrentPrice(price);
-                        // Set initial range based on default preset
-                        // Use a timeout to ensure state update has processed if needed, though not strictly necessary for presets logic usually
-                        applyPreset('5%', price);
-                    } else {
-                        console.warn("CreatePositionPanel: Invalid price from backend:", poolData.price);
-                    }
+                // 1. Fetch USD prices for both tokens (using reliable priceService)
+                const priceA = await getTokenPrice(tokenA);
+                const priceB = await getTokenPrice(tokenB);
+
+                console.log("CreatePositionPanel: USD Prices:", { [tokenA]: priceA, [tokenB]: priceB });
+
+                setTokenAPriceUsd(priceA);
+                setTokenBPriceUsd(priceB);
+
+                // 2. Determine which token to display for yield farming
+                // Priority: Show the ALTCOIN (not SOL, not stablecoin)
+                // - SOL/PENGU → show PENGU (altcoin to yield farm)
+                // - JupSOL/SOL → show JupSOL (altcoin to yield farm)
+                // - SOL/USDC → show SOL (no altcoin, so show SOL not stablecoin)
+                const stablecoins = ['USDC', 'USDT'];
+                const isTokenAStable = stablecoins.includes(tokenA);
+                const isTokenBStable = stablecoins.includes(tokenB);
+                const isTokenASOL = tokenA === 'SOL';
+                const isTokenBSOL = tokenB === 'SOL';
+
+                let displayTokenA: boolean;
+
+                if (isTokenAStable) {
+                    // TokenA is stablecoin → show tokenB (SOL or altcoin)
+                    displayTokenA = false;
+                } else if (isTokenBStable) {
+                    // TokenB is stablecoin → show tokenA (SOL or altcoin)
+                    displayTokenA = true;
+                } else if (isTokenASOL && !isTokenBSOL) {
+                    // SOL/Altcoin → show Altcoin (tokenB)
+                    displayTokenA = false;
+                } else if (isTokenBSOL && !isTokenASOL) {
+                    // Altcoin/SOL → show Altcoin (tokenA)
+                    displayTokenA = true;
                 } else {
-                    console.warn("CreatePositionPanel: No price in pool data");
+                    // Both are altcoins or both are SOL → show tokenA
+                    displayTokenA = true;
                 }
 
-                // 2. Fetch USD prices in background (don't block UI)
-                getTokenPrice(tokenA).then(p => setTokenAPriceUsd(p)).catch(console.error);
-                getTokenPrice(tokenB).then(p => setTokenBPriceUsd(p)).catch(console.error);
+                const displayPrice = displayTokenA ? priceA : priceB;
+                const displayToken = displayTokenA ? tokenA : tokenB;
+
+                console.log('CreatePositionPanel: Display token:', displayToken, '=', displayPrice);
+
+                setDisplayToken(displayToken);
+
+                if (displayPrice > 0) {
+                    setCurrentPrice(displayPrice);
+
+                    // Apply default preset immediately based on this USD price
+                    const percentage = 0.05; // Default 5%
+                    const min = displayPrice * (1 - percentage);
+                    const max = displayPrice * (1 + percentage);
+                    setMinPrice(min.toFixed(4));
+                    setMaxPrice(max.toFixed(4));
+                } else {
+                    console.warn("CreatePositionPanel: Failed to fetch USD price for", displayToken);
+                }
 
             } catch (error) {
-                console.error('Error fetching pool data:', error);
-                setErrorMessage("Failed to load pool data. Please try again.");
+                console.error("CreatePositionPanel: Price fetch error:", error);
             } finally {
                 setPriceLoading(false);
             }
         };
 
+        fetchPrice();
+        const interval = setInterval(fetchPrice, 30000); // Poll every 30s
+        return () => clearInterval(interval);
+
+    }, [isOpen, poolAddress, tokenA, tokenB]);
+
+    // Reset states when opening
+    useEffect(() => {
         if (isOpen) {
-            fetchPrice();
-            // Reset states when opening
             setTxStatus('idle');
             setErrorMessage(null);
             setTxSignature(null);
@@ -203,11 +254,23 @@ export const CreatePositionPanel: FC<CreatePositionPanelProps> = ({
                 slippage
             });
 
+            // Convert prices from Display (USD) to Pool Units (TokenB / TokenA)
+            // If Token B is NOT a stablecoin (e.g. PENGU), we must divide USD price by Token B USD price.
+            // Example: Lower = $126 (USD/SOL) / $0.01 (USD/PENGU) = 12,600 PENGU/SOL
+            let submissionLower = minPrice;
+            let submissionUpper = maxPrice;
+
+            if (tokenBPriceUsd > 0 && !['USDC', 'USDT'].includes(tokenB)) {
+                submissionLower = (parseFloat(minPrice) / tokenBPriceUsd).toFixed(6);
+                submissionUpper = (parseFloat(maxPrice) / tokenBPriceUsd).toFixed(6);
+                console.log(`Converting USD bounds to Pool Units: ${minPrice} -> ${submissionLower}, ${maxPrice} -> ${submissionUpper}`);
+            }
+
             const response = await api.createOrDeposit({
                 wallet: publicKey.toString(),
                 whirlpool: poolAddress,
-                priceLower: minPrice,
-                priceUpper: maxPrice,
+                priceLower: submissionLower,
+                priceUpper: submissionUpper,
                 amountA: amountA
             });
 
@@ -259,7 +322,7 @@ export const CreatePositionPanel: FC<CreatePositionPanelProps> = ({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-card w-full max-w-5xl rounded-2xl border border-border shadow-2xl animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <div className="bg-card w-full max-w-7xl rounded-2xl border border-border shadow-2xl animate-in fade-in zoom-in-95 duration-200">
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-border sticky top-0 bg-card z-10">
                     <div className="flex items-center gap-2">
@@ -282,20 +345,29 @@ export const CreatePositionPanel: FC<CreatePositionPanelProps> = ({
                 </div>
 
                 {viewMode === 'deposit' ? (
-                    /* Deposit View */
-                    <div className="flex flex-col md:flex-row h-full">
-                        {/* Left Column: Chart */}
-                        <div className="w-full md:w-1/2 p-4 border-b md:border-b-0 md:border-r border-border bg-muted/10">
-                            <div className="h-[400px] w-full">
+                    /* Deposit View - 4 Column Layout: News | Chart | Inputs | AI */
+                    <div className="flex flex-col lg:flex-row h-full">
+                        {/* Column 1: News Panel */}
+                        <div className="w-full lg:w-[15%] p-4 border-b lg:border-b-0 lg:border-r border-border bg-muted/10 overflow-hidden">
+                            <TokenNewsPanel
+                                tokenA={tokenA}
+                                tokenB={tokenB}
+                                isOpen={isOpen}
+                            />
+                        </div>
+
+                        {/* Column 2: Chart (Wider) */}
+                        <div className="w-full lg:w-[35%] p-4 border-b lg:border-b-0 lg:border-r border-border bg-muted/10 space-y-4 overflow-hidden flex flex-col">
+                            <div className="flex-1 w-full min-h-[350px]">
                                 <PriceChart
-                                    coinId={getCoinGeckoId(tokenA)}
-                                    title={`${tokenA} Price`}
+                                    coinId={getCoinGeckoId(displayToken)}
+                                    title={`${displayToken} Price`}
                                 />
                             </div>
                         </div>
 
-                        {/* Right Column: Inputs */}
-                        <div className="w-full md:w-1/2 p-4 space-y-4">
+                        {/* Column 3: Inputs */}
+                        <div className="w-full lg:w-[25%] p-4 space-y-4 border-b lg:border-b-0 lg:border-r border-border">
                             {/* Info Banner */}
                             <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 flex items-start gap-2">
                                 <Info className="text-blue-400 shrink-0 mt-0.5" size={16} />
@@ -338,7 +410,7 @@ export const CreatePositionPanel: FC<CreatePositionPanelProps> = ({
                                 <div className="flex items-center justify-between text-sm">
                                     <span className="text-muted-foreground">Current Price</span>
                                     <span className="font-mono font-medium">
-                                        {priceLoading ? 'Loading...' : `$${currentPrice.toFixed(4)} `}
+                                        {priceLoading ? 'Loading...' : `$${currentPrice.toFixed(4)}`}
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
@@ -481,7 +553,37 @@ export const CreatePositionPanel: FC<CreatePositionPanelProps> = ({
                                 )
                             }
                         </div>
-                    </div >
+
+                        {/* Column 4: AI Insights */}
+                        <div className="w-full lg:w-[25%] p-4">
+                            <MLInsightsPanel
+                                tokenA={tokenA}
+                                tokenB={tokenB}
+                                isOpen={isOpen}
+                                currentPriceA={
+                                    // If B is stable (e.g. USDC), then Pool Price (B per A) is the price of A in USD
+                                    (['USDC', 'USDT'].includes(tokenB) && currentPrice > 0)
+                                        ? currentPrice
+                                        : (tokenAPriceUsd || undefined)
+                                }
+                                currentPriceB={
+                                    // If A is stable (e.g. USDC), then Pool Price (B per A) is Price of A in B. 
+                                    // Implies Price of B in A = 1/Pool Price.
+                                    (['USDC', 'USDT'].includes(tokenA) && currentPrice > 0)
+                                        ? (1 / currentPrice)
+                                        : (tokenBPriceUsd || undefined)
+                                }
+                                onPredictedRangeChange={(lower, upper) => {
+                                    // ML returns lower/upper in USD for Token A.
+                                    // Since we are now in "USD Mode" for display, we just use them directly.
+                                    if (selectedPreset !== 'custom') {
+                                        setMinPrice(lower.toFixed(4));
+                                        setMaxPrice(upper.toFixed(4));
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
                 ) : (
                     /* Range View */
                     <div className="p-4 space-y-4">
@@ -489,7 +591,7 @@ export const CreatePositionPanel: FC<CreatePositionPanelProps> = ({
                         <div className="flex items-center justify-between">
                             <span className="text-sm font-medium">Position Range</span>
                             <span className="text-xs text-muted-foreground">
-                                ⇄ {tokenB} per {tokenA}
+                                USD per {tokenA}
                             </span>
                         </div>
 
@@ -578,10 +680,10 @@ export const CreatePositionPanel: FC<CreatePositionPanelProps> = ({
                                         className="flex-1 bg-transparent text-center font-mono text-sm focus:outline-none"
                                     />
                                     <button
-                                        onClick={() => setMinPrice((parseFloat(minPrice) + 1).toFixed(4))}
+                                        onClick={() => setMinPrice((parseFloat(minPrice) - 1).toFixed(4))}
                                         className="p-2 text-muted-foreground hover:text-foreground"
                                     >
-                                        <Plus size={16} />
+                                        <Minus size={16} />
                                     </button>
                                 </div>
                             </div>
