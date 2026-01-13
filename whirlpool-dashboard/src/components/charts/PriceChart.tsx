@@ -15,7 +15,7 @@ interface PriceChartProps {
     title?: React.ReactNode;
 }
 
-const BACKEND_URL = 'http://localhost:3001';
+const BACKEND_URL = 'https://yieldsense-backend-a8c2.onrender.com';
 
 export const PriceChart = ({ data = [], loading: initialLoading, coinId, title = 'Price History' }: PriceChartProps) => {
     const [timeRange, setTimeRange] = useState('24H');

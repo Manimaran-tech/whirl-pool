@@ -38,7 +38,7 @@ let stakingCache: StakingAPYResponse | null = null;
 let cacheTimestamp = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-const ML_API_URL = 'http://localhost:8000';
+const ML_API_URL = 'https://aguishly-ascertainable-londyn.ngrok-free.dev';
 
 /**
  * Check if a token is a liquid staking token

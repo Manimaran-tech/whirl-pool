@@ -23,7 +23,7 @@ export interface UseWebSocketReturn {
     unsubscribe: () => void;
 }
 
-const WS_URL = 'ws://localhost:3001';
+const WS_URL = 'wss://yieldsense-backend-a8c2.onrender.com';
 
 export const useWebSocket = (options?: Partial<UseWebSocketOptions>): UseWebSocketReturn => {
     const [isConnected, setIsConnected] = useState(false);

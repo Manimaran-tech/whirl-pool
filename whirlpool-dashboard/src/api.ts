@@ -1,4 +1,4 @@
-const BACKEND_URL = 'http://localhost:3001';
+const BACKEND_URL = 'https://yieldsense-backend-a8c2.onrender.com';
 
 export interface PositionInfo {
     positionMint: string;
@@ -141,7 +141,7 @@ export const api = {
 
 // --- Trading API (separate backend on port 3002) ---
 
-const TRADING_API_URL = 'http://localhost:3002';
+const TRADING_API_URL = 'https://yieldsense-trading-api-a8c2.onrender.com';
 
 export interface SwapQuote {
     route: 'JUPITER' | 'ORCA';
