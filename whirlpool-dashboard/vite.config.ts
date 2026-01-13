@@ -1,23 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
-    nodePolyfills({
-      include: ['buffer', 'process', 'util', 'stream', 'events', 'crypto'],
-      globals: {
-        Buffer: true,
-        global: true,
-        process: true,
-      },
-      overrides: {
-        fs: 'memfs',
-      },
-      protocolImports: true,
-    }),
   ],
   server: {
     port: 3005,
@@ -38,13 +25,17 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      buffer: 'buffer/',
       process: 'process/browser',
-      buffer: 'buffer',
+      stream: 'stream-browserify',
+      util: 'util/',
     },
   },
   define: {
     'process.env': {},
     global: 'globalThis',
   },
+  optimizeDeps: {
+    include: ['buffer', 'process'],
+  },
 })
-
